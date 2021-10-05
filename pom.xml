@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>it.csi.moti</groupId>
+	<artifactId>motidb</artifactId>
+	<version>${revision}</version>
+	<packaging>pom</packaging>
+
+	<name>MOTI DataBase</name>
+	<description>Produce un archivio TAR contenente gli script di adeguamento del DB</description>
+
+	<inceptionYear>2020</inceptionYear>
+	<organization>
+		<name>CSI Piemonte</name>
+		<url>https://www.csipiemonte.it</url>
+	</organization>
+	<!-- <licenses> <license> <name>EUPL 1.2</name> <url>https://joinup.ec.europa.eu/sites/default/files/custom-page/attachment/2020-03/EUPL-1.2%20EN.txt</url> 
+		<distribution>repo</distribution> </license> </licenses> -->
+
+	<properties>
+		<revision>1.0.0</revision>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Compiler configuration -->
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+
+		<!-- Configuration for the remote repository -->
+		<repository.url>http://@@REPOSITORY_MAVEN@@/artifactory/maven2</repository.url>
+
+		<!-- Plugin configuration -->
+		<plugin.version.assembly>3.3.0</plugin.version.assembly>
+		<plugin.version.antrun>3.0.0</plugin.version.antrun>
+
+		<plugin.version.build-helper>3.1.0</plugin.version.build-helper>
+		<plugin.version.license>2.0.0</plugin.version.license>
+		<!-- <plugin.version.bom-builder>1.2.0</plugin.version.bom-builder> -->
+
+	</properties>
+
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>maven2</name>
+			<url>${repository.url}</url>
+		</repository>
+		<repository>
+			<snapshots></snapshots>
+			<id>snapshots</id>
+			<name>maven2</name>
+			<url>${repository.url}</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>maven2</name>
+			<url>${repository.url}</url>
+		</pluginRepository>
+		<pluginRepository>
+			<snapshots></snapshots>
+			<id>snapshots</id>
+			<name>maven2</name>
+			<url>${repository.url}</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<profiles>
+		<profile>
+			<id>dev-int-01</id>
+			<properties>
+				<build.profile.id>dev-int-01</build.profile.id>
+			</properties>
+		</profile>
+		<profile>
+			<id>dev-cmto-01</id>
+			<properties>
+				<build.profile.id>dev-cmto-01</build.profile.id>
+			</properties>
+		</profile>
+		<profile>
+			<id>dev-rp-01</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<build.profile.id>dev-rp-01</build.profile.id>
+			</properties>
+		</profile>
+		<profile>
+			<id>test-cmto-01</id>
+			<properties>
+				<build.profile.id>test-cmto-01</build.profile.id>
+			</properties>
+		</profile>
+		<profile>
+			<id>test-int-01</id>
+			<properties>
+				<build.profile.id>test-int-01</build.profile.id>
+			</properties>
+		</profile>
+		<profile>
+			<id>test-rp-01</id>
+			<properties>
+				<build.profile.id>test-rp-01</build.profile.id>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod-cmto-01</id>
+			<properties>
+				<build.profile.id>prod-cmto-01</build.profile.id>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod-int-01</id>
+			<properties>
+				<build.profile.id>prod-int-01</build.profile.id>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod-rp-01</id>
+			<properties>
+				<build.profile.id>prod-rp-01</build.profile.id>
+			</properties>
+		</profile>
+
+		<!-- Invoke via ./mvnw clean package -P add-license -->
+		<profile>
+			<id>add-license</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<build.profile.id>dev-rp-01</build.profile.id>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>rootlocation</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>rootlocation</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>license-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>add-licenses</id>
+								<goals>
+									<goal>update-file-header</goal>
+									<goal>update-project-license</goal>
+								</goals>
+								<phase>process-sources</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+							<canUpdateLicense>false</canUpdateLicense>
+							<licenseName>eupl-1.2</licenseName>
+							<licenseResolver>file:///${rootlocation}/docs/license</licenseResolver>
+							<processStartTag>========================LICENSE_START=================================</processStartTag>
+							<processEndTag>=========================LICENSE_END==================================</processEndTag>
+							<!-- <excludes> <exclude>main/angular/**/*</exclude> <exclude>main/java/it/csi/siac/**/*</exclude> 
+								<exclude>main/java/it/eng/auriga/**/*</exclude> </excludes> -->
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Invoke via ./mvnw clean package bom-builder:build-bom -Pgenerate-bom -->
+		<profile>
+			<id>generate-bom</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<build.profile.id>dev-rp-01</build.profile.id>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jboss.maven.plugins</groupId>
+						<artifactId>bom-builder-maven-plugin</artifactId>
+						<version>${plugin.version.bom-builder}</version>
+						<executions>
+							<execution>
+								<id>build-bom</id>
+								<goals>
+									<goal>build-bom</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<bomGroupId>${project.groupId}</bomGroupId>
+							<bomArtifactId>${project.artifactId}-bom</bomArtifactId>
+							<bomVersion>${revision}</bomVersion>
+							<bomDescription>${project.description}</bomDescription>
+							<bomName>${project.name}</bomName>
+							<outputFilename>${project.artifactId}.bom-pom.xml</outputFilename>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+	</profiles>
+
+	<build>
+		<finalName>motidb</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>${plugin.version.antrun}</version>
+				<executions>
+					<execution>
+						<id>file-concat</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<concat
+									destfile="${project.build.directory}/motidb-${revision}.sql"
+									overwrite="yes" encoding="UTF-8" fixlastline="yes" eol="lf">
+									<sort
+										xmlns:rcmp="antlib:org.apache.tools.ant.types.resources.comparators">
+										<fileset
+											dir="${project.basedir}/src/sql/target/schema/">
+											<include name="motidb-create-01-tables-all.sql"></include>
+											<include name="motidb-create-02-constraints-all.sql"></include>
+											<include name="motidb-create-03-indexes-all.sql"></include>
+											<include name="motidb-create-04-grants-all.sql"></include>
+										</fileset>
+										<rcmp:name />
+									</sort>
+									<fileset dir="${project.basedir}/src/sql/target/data/">
+										<include name="motidb-data.sql"></include>
+									</fileset>
+									<fileset
+										dir="${project.basedir}/src/sql/target/schema/">
+										<include name="motidb-create-sequences-all.sql"></include>
+									</fileset>
+									<fileset
+										dir="${project.basedir}/src/sql/target/configuration/">
+										<include name="${build.profile.id}.sql"></include>
+									</fileset>
+								</concat>
+
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${plugin.version.assembly}</version>
+				<executions>
+					<execution>
+						<id>distro-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>buildfiles/distribution.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<!-- here the phase you need -->
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<overwrite>true</overwrite>
+							<outputDirectory>${project.basedir}/dist/${build.profile.id}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.build.directory}</directory>
+									<!-- <filtering>true</filtering> -->
+									<includes>
+										<include>*.zip</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

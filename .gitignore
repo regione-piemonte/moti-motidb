@@ -1,0 +1,26 @@
+# Class files
+*.class
+
+# Package Files
+*.jar
+*.war
+*.ear
+
+# Target folder
+/target/
+logs/
+dist/
+
+# Eclipse files
+.classpath
+.metadata
+.project
+.springBeans
+*.launch
+
+# Eclipse folders
+.externalToolBuilders/
+.recommenders/
+.settings/
+.sonar/
+/bin/
